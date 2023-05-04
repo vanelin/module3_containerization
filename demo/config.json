@@ -19,7 +19,7 @@
 				"CAP_AUDIT_WRITE",
 				"CAP_KILL",
 				"CAP_NET_BIND_SERVICE",
-       				 "CAP_NET_RAW"
+       				"CAP_NET_RAW"
 			],
 			"effective": [
 				"CAP_AUDIT_WRITE",

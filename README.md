@@ -1,32 +1,84 @@
-#  task_3 (Container image з нуля)
+#  task_4 (Your Kubernetes cluster)
 
-### Utilites:
+### Steps:
 ```bash
-sudo apt install bridge-utils
-sudo apt install iputils-ping
+touch Dockerfile
+docker build .
+docker run -p 8080:8080 sha256:xxxxxx
+docker tag da10aa926167 gcr.io/minikube-385711/demo:v1.0.0
+
+docker images
+#REPOSITORY                    TAG       IMAGE ID       CREATED       SIZE
+gcr.io/minikube-385711/demo   v1.0.0    da10aa926167   6 weeks ago   4.86MB
+busybox                       latest    7cfbbec8963d   6 weeks ago   4.86MB
+
+#install Google Cloud Code extantions to vscode
+gcloud auth login
+gcloud config set project minikube-385711
+gcloud auth configure-docker
+docker push gcr.io/minikube-385711/demo:v1.0.0
+
+gcloud container images list
+#NAME
+gcr.io/minikube-385711/demo
+
+
+
 ```
-### Network Setup With runC Containers
+
+# dive
+**A tool for exploring a docker image, layer contents, and discovering ways to shrink the size of your Docker/OCI image.**
+https://github.com/wagoodman/dive
+
+## Installation
+
+**Ubuntu/Debian**
 ```bash
-brctl addbr box_network0
-ip link set box_network0 up
-
-ip addr add 10.10.10.1/24 dev box_network0
-ip link add name veth-host type veth peer name veth-guest
-ip link set veth-host up
-
-brctl addif box_network0 veth-host
-ip netns add box_network
-ip link set veth-guest netns box_network
-ip netns exec box_network ip link set veth-guest name eth1
-ip netns exec box_network ip addr add 10.10.10.2/24 dev eth1
-ip netns exec box_network ip link set eth1 up
-ip netns exec box_network ip route add default via 10.10.10.1
+wget https://github.com/wagoodman/dive/releases/download/v0.9.2/dive_0.9.2_linux_amd64.deb
+sudo apt install ./dive_0.9.2_linux_amd64.deb
 ```
 
-### check
+**RHEL/Centos**
+```bash
+curl -OL https://github.com/wagoodman/dive/releases/download/v0.9.2/dive_0.9.2_linux_amd64.rpm
+rpm -i dive_0.9.2_linux_amd64.rpm
+```
+
 ``` bash
-sudo runc run demo
-listening on [::]:8080
+dive --ci --lowestEfficiency=0.9 da10aa926167
 
-curl 10.10.10.2:8080
+  Using default CI config
+Image Source: docker://da10aa926167
+Fetching image... (this can take a while for large images)
+Analyzing image...
+  efficiency: 100.0000 %
+  wastedBytes: 0 bytes (0 B)
+  userWastedPercent: NaN %
+Inefficient Files:
+Count  Wasted Space  File Path
+None
+Results:
+  PASS: highestUserWastedPercent
+  SKIP: highestWastedBytes: rule disabled
+  PASS: lowestEfficiency
+Result:PASS [Total:3] [Passed:2] [Failed:0] [Warn:0] [Skipped:1]
+```
+
+### configure minikube and deploy/demo to k8s
+```bash
+minikube start
+k config view
+k config current-context
+k version --short
+k get all -A
+k create deploy demo --image gcr.io/minikube-385711/demo:v1.0.0
+k get deploy -o wide
+k get po,svc,ep --show-labels
+k logs deployments/demo
+k exec -it deploy/demo -- sh
+k expose deployment/demo --port 80 --target-port 8080
+k get po,svc,ep --show-labels
+k port-forward svc/demo 8080:80&
+curl localhost:8080
+fg #return to background
 ```
