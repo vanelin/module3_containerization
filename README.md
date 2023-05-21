@@ -1,4 +1,4 @@
-#  task_4 (Your Kubernetes cluster)
+#  module 5 task-2 (Your Kubernetes cluster)
 
 ### Steps:
 ```bash
