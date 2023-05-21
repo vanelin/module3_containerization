@@ -5,18 +5,18 @@
 touch Dockerfile
 docker build .
 docker run -p 8080:8080 sha256:xxxxxx
-docker tag da10aa926167 gcr.io/minikube-385711/demo:v1.0.0
+docker tag da10aa926167 gcr.io/minikube-385711/demo:v2.0.0
 
 docker images
 #REPOSITORY                    TAG       IMAGE ID       CREATED       SIZE
-gcr.io/minikube-385711/demo   v1.0.0    da10aa926167   6 weeks ago   4.86MB
+gcr.io/minikube-385711/demo   v2.0.0    da10aa926167   6 weeks ago   4.86MB
 busybox                       latest    7cfbbec8963d   6 weeks ago   4.86MB
 
 #install Google Cloud Code extantions to vscode
 gcloud auth login
 gcloud config set project minikube-385711
 gcloud auth configure-docker
-docker push gcr.io/minikube-385711/demo:v1.0.0
+docker push gcr.io/minikube-385711/demo:v2.0.0
 
 gcloud container images list
 #NAME
@@ -71,7 +71,7 @@ k config view
 k config current-context
 k version --short
 k get all -A
-k create deploy demo --image gcr.io/minikube-385711/demo:v1.0.0
+k create deploy demo --image gcr.io/minikube-385711/demo:v2.0.0
 k get deploy -o wide
 k get po,svc,ep --show-labels
 k logs deployments/demo
